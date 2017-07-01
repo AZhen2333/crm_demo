@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+	<!-- 开发者模式 副作用：打开后，无法处理ajax请求的异常 -->
+	<!-- <constant name="struts.devMode" value="true" /> -->
+	<!-- 开启自动加载核心配置文件功能 -->
+	<constant name="struts.configuration.xml.reload" value="true" />
+	<!-- 简单样式 -->
+	<constant name="struts.ui.theme" value="simple" />
+	<!-- 一次上传的最大大小 -->
+	<constant name="struts.multipart.maxSize" value="209715200"></constant>
+	
+	<package name="default" namespace="/" extends="struts-default">
+		<!-- 自定义拦截器 -->
+		<interceptors>
+			<!-- 注册自定义的拦截器 -->
+			<interceptor name="loginInterceptor"
+				class="com.itheima.demo.web.action.LoginInterceptor"></interceptor>
+			<!-- 创建自定义拦截器栈 -->
+			<interceptor-stack name="myStack">
+				<interceptor-ref name="loginInterceptor">
+					<!-- 排除在外，不拦截的方法 -->
+					<param name="excludeMethod">login</param>
+				</interceptor-ref>
+				<interceptor-ref name="defaultStack" />
+			</interceptor-stack>
+		</interceptors>
+		<!-- 自定义的拦截器栈，覆盖默认的拦截器栈 -->
+		<default-interceptor-ref name="myStack"/>
+
+
+		<action name="user_*" class="com.itheima.demo.web.action.UserAction"
+			method="{1}">
+			<result name="login">/login.jsp</result>
+			<result name="success">/index.jsp</result>
+		</action>
+		<action name="customer_*" class="com.itheima.demo.web.action.CustomerAction"
+			method="{1}">
+			<result name="addjsp">/jsp/customer/add.jsp</result>
+			<result name="listjsp">/jsp/customer/list.jsp</result>
+			<result name="listPageAction" type="redirectAction">customer_listPage
+			</result>
+			<result name="editjsp">/jsp/customer/edit.jsp</result>
+			<!-- 使用局部拦截器覆盖全局 -->
+			<interceptor-ref name="myStack">
+				<!-- 文件扩展名：setAllowedExtensions -->
+				<param name="fileUpload.allowedExtensions">.jpg,.jpeg,.doc,.docx,.itheima,.avi</param>
+				<!-- 文件大小：setMaximumSize Sets the maximum size of an uploaded file,in 
+					bytes 上传的一个文件的大小限制 -->
+				<!-- <param name="fileUpload.maximumSize">1024*1024*10</param> -->
+			</interceptor-ref>
+			<!-- 添加的错误返回页面 -->
+			<result name="input">/jsp/customer/add.jsp</result>
+			<result name="editinput">/jsp/customer/edit.jsp</result>
+		</action>
+
+		<!-- 数据字典 -->
+		<action name="baseDict_*" class="com.itheima.demo.web.action.BaseDictAction"
+			method="{1}">
+		</action>
+		<!-- LinkMan -->
+		<action name="linkMan_*" class="linkManAction" method="{1}">
+			<result name="listjsp">/jsp/linkman/list.jsp</result>
+			<result name="addjsp">/jsp/linkman/add.jsp</result>
+			<result name="editjsp">/jsp/linkman/edit.jsp</result>
+			<result name="listPageAction" type="redirectAction">linkMan_listPage</result>
+		</action>
+		<!-- SaleVisit -->
+		<action name="saleVisit_*" class="saleVisitAction" method="{1}">
+			<result name="listjsp">/jsp/salevisit/list.jsp</result>
+			<result name="addjsp">/jsp/salevisit/add.jsp</result>
+			<result name="listPageAction" type="redirectAction">saleVisit_listPage</result>
+		</action>
+	</package>
+
+</struts>
